@@ -4,8 +4,8 @@ init-db:
 
 migrate-db:
 	docker-compose exec bot aerich migrate
-	docker-compose exec bot aerich upgade
+	docker-compose exec bot aerich upgrade
 
 
 compile:
-	docker-compose exec bot pybabel compile -d locales -D swipebot
+	docker-compose exec bot pybabel compile -d locales -D SWIPEbot

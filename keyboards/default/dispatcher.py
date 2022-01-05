@@ -103,4 +103,4 @@ async def get_menu_label(path: str) -> str:
     :param path: 'LEVEL_1:LEVEL_2/LEVEL_2_POSTS'
     """
     levels = path.split('/')
-    return menu_label.get(levels[-1], translate('Возврат'))
+    return menu_label.get(levels[-1], 'Возврат')

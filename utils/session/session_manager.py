@@ -45,7 +45,8 @@ class SessionManager(BaseSessionManager):
                 return data
         return {'Error': 'Нет id пользователя'}
 
-    async def post(self, path: str, data: dict = None, params: dict = None, user_id: int = None) -> Tuple[Dict[str, str], int]:
+    async def post(self, path: str, data: dict = None, params: dict = None, user_id: int = None) -> Tuple[
+        Dict[str, str], int]:
         absolute_url = await self._prepare_url(path, user_id)
         headers = await self._get_authorization_header(user_id)
         if headers and headers.get('Authorization'):

@@ -17,7 +17,7 @@ from keyboards.default.dispatcher import dispatcher
 
 async def authorize_user(user_id: int) -> User:
     user = await User.get(user_id=user_id)
-    data = await Conn.authorize(REL_URLS['login'], params={'phone_number': user.phone_number},
+    data = await Conn.authorize(REL_URLS['login'], params={'phone': user.phone},
                                 user_id=user.user_id)
     if data.get('auth'):
         user.token = data.get('auth')
@@ -28,6 +28,7 @@ async def authorize_user(user_id: int) -> User:
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
+    print('state start')
     await message.answer(f"Привет/Hi, {message.from_user.full_name}!")
     await message.answer('Язык/Language', reply_markup=lang_markup)
     await StartState.LANG.set()
@@ -35,6 +36,7 @@ async def bot_start(message: types.Message):
 
 @dp.callback_query_handler(LANG_CB.filter(action='lang'), state=StartState.LANG)
 async def lang(call: types.CallbackQuery, callback_data: dict, state: FSMContext):
+    print('state ', state.get_state())
     await call.answer()
     language = callback_data.get('lang')
     await state.set_data({'language': language})
@@ -48,6 +50,7 @@ async def lang(call: types.CallbackQuery, callback_data: dict, state: FSMContext
 
 @dp.message_handler(state=StartState.CONFIRM)
 async def confirm_starter(message: types.Message):
+    print('state ', StartState.CONFIRM)
     await message.answer('Отправьте Ваш номер для регистрации',
                          reply_markup=await defaults.get_contact_button())
     await StartState.PHONE.set()
@@ -55,11 +58,12 @@ async def confirm_starter(message: types.Message):
 
 @dp.message_handler(commands=['cancel'], state=StartState)
 async def cancel(message: types.Message, state: FSMContext):
+    print('state ', state)
     data = await state.get_data()
     user = await authorize_user(data.get('user'))
     if user:
         keyboard, path = await dispatcher('LEVEL_1', message.from_user.id)
-        await message.answer('Вы успешно зарегестрированы в системе',
+        await message.answer('Вы успешно зарегистрированы в системе',
                              reply_markup=keyboard)
         await state.finish()
         await state.update_data(path=path)
@@ -70,6 +74,7 @@ async def cancel(message: types.Message, state: FSMContext):
 
 @dp.message_handler(content_types=['contact'], state=StartState.PHONE)
 async def phone_number(message: types.Message, state: FSMContext):
+    print('state ', state)
     if message.content_type != 'contact':
         await message.answer('Пожалуйста, отправьте ваш номер для регистрации')
         return
