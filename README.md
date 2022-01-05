@@ -1,0 +1,2 @@
+# SWIPEbot
+AIOGRAM bot for SWIPE RESTful API
